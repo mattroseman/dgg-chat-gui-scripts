@@ -748,6 +748,12 @@ function injectScript() {
   Object.assign(rumbleChatButton.style, EMBED_BUTTON_STYLE);
   rumbleChatButton.innerHTML = RUMBLE_CHAT_ICON;
 
+  const kickChatButton = document.createElement('a');
+  kickChatButton.id = 'kick-chat-btn';
+  kickChatButton.addEventListener('click', handleKickChatButtonClick);
+  Object.assign(kickChatButton.style, EMBED_BUTTON_STYLE);
+  kickChatButton.innerHTML = KICK_CHAT_ICON;
+
   const embedChatButtonsContainer = document.createElement('div');
   embedChatButtonsContainer.id = 'embed-chat-btns-container';
   embedChatButtonsContainer.className += 'float-start';
@@ -765,6 +771,7 @@ function injectScript() {
   embedChatButtonsContainer.appendChild(twitchChatButton);
   embedChatButtonsContainer.appendChild(youtubeChatButton);
   embedChatButtonsContainer.appendChild(rumbleChatButton);
+  embedChatButtonsContainer.appendChild(kickChatButton);
 
   // =========================================
   // Functions for managing the embedded chats 
@@ -823,6 +830,11 @@ function injectScript() {
     const streamInfo = JSON.parse(localStorage.getItem(STORAGE_STREAM_INFO_KEY));
     return streamInfo?.streams?.rumble?.id;
   }
+  function getKickLiveId() {
+    // until the live stream info JSON is known, only 'destiny' will be returned as long as the kick field isn't null
+    const streamInfo = JSON.parse(localStorage.getItem(STORAGE_STREAM_INFO_KEY));
+    return 'destiny' ? streamInfo?.streams?.kick != null : null;
+  }
 
   function getTwitchChatURL() {
     const twitchEmbedId = getTwitchEmbedId() || getTwitchLiveId() || getTwitchHostId();
@@ -848,6 +860,10 @@ function injectScript() {
       `https://rumble.com/chat/popup/${chatId}` :
       null;
   }
+  function getKickChatURL() {
+    let kickEmbedId = getKickLiveId();
+    return kickEmbedId ? `https://kick.com/${kickEmbedId}/chatroom`: null;
+  }
 
   /**
    * updateEmbedChatButtons checks to see what's live or embedded, and adds/removes the corresponding embed chat buttons.
@@ -858,6 +874,7 @@ function injectScript() {
     twitchChatButton.style.display = getTwitchChatURL() ? 'flex' : 'none';
     youtubeChatButton.style.display = getYoutubeChatURL() ? 'flex' : 'none';
     rumbleChatButton.style.display = getRumbleChatURL() ? 'flex' : 'none';
+    kickChatButton.style.display = getKickChatURL() ? 'flex' : 'none';
   }
 
   // observer which responds to changes to the embedded stream iframe, and triggers an update of the embedded chat buttons
@@ -915,6 +932,12 @@ function injectScript() {
     const rumbleChatURL = getRumbleChatURL();
     if (rumbleChatURL != null) {
       activateEmbedChat(rumbleChatURL);
+    }
+  }
+  function handleKickChatButtonClick() {
+    const kickChatURL = getKickChatURL();
+    if (kickChatURL != null) {
+      activateEmbedChat(kickChatURL);
     }
   }
 
