@@ -833,7 +833,7 @@ function injectScript() {
   function getKickLiveId() {
     // until the live stream info JSON is known, only 'destiny' will be returned as long as the kick field isn't null
     const streamInfo = JSON.parse(localStorage.getItem(STORAGE_STREAM_INFO_KEY));
-    return 'destiny' ? streamInfo?.streams?.kick != null : null;
+    return streamInfo?.streams?.kick != null ? "destiny" : null;
   }
 
   function getTwitchChatURL() {
